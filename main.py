@@ -25,7 +25,7 @@ link_login.click()
 
 # Insere o nome de usuário
 username = WebDriverWait(driver, 15).until(EC.element_to_be_clickable((By.ID, 'USULOGIN')))
-username.send_keys("_")  # Criar teste para validar CNPJ
+username.send_keys("_")
 
 # Insere a senha
 password = WebDriverWait(driver, 15).until(EC.element_to_be_clickable((By.ID, 'USUPASSWD')))
