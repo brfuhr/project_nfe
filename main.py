@@ -4,8 +4,20 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 
+def obter_cadastro():
+    username = input("Digite o CNPJ: ")
+    password = input("Digite a senha: ")
+    return (username, password)
+
+# Obtém o login antes de abrir o navegador
+login = obter_cadastro()
+username = login[0]
+password = login[1]
+
 # Define a URL
 url = "https://www.e-nfs.com.br/e-nfs_canoas/portal/"
+
+# https://e-nfs.com.br/e-nfs_canoas/servlet/hlogin alterar pra esse link 
 
 # Configurações do navegador
 chrome_options = Options()
@@ -19,25 +31,42 @@ chrome_options.add_experimental_option("prefs", prefs)
 driver = webdriver.Chrome(options=chrome_options)
 driver.get(url)
 
-# Clica no link "Login Empresa / Autônomo"
-link_login = driver.find_element(By.LINK_TEXT, "Login Empresa / Autônomo")
-link_login.click()
+# Aguarda o carregamento completo da página
+def wait_for_page_load():
+        WebDriverWait(driver, 30).until(lambda driver: driver.execute_script("return document.readyState") == "complete")
 
-# Insere o nome de usuário
-username = WebDriverWait(driver, 15).until(EC.element_to_be_clickable((By.ID, 'USULOGIN')))
-username.send_keys("_")  # Criar teste para validar CNPJ
+# Aguarda elemento clicável
+def wait_for_element(by, value):
+    try:
+        return WebDriverWait(driver, 30).until(EC.element_to_be_clickable((by, value)))
+    except:
+        print("Elemento não encontrado ou não clicável.")
 
-# Insere a senha
-password = WebDriverWait(driver, 15).until(EC.element_to_be_clickable((By.ID, 'USUPASSWD')))
-password.send_keys("_")
+# Clicar no elemento pelo texto
+def clicar_elemento_por_texto(tag, texto):
+    xpath = f"//{tag}[text()='{texto}']"
+    clicar_elemento(xpath)
 
-# Clica no botão de login
-botao_login = WebDriverWait(driver, 15).until(EC.visibility_of_element_located((By.CLASS_NAME, 'btn-signin')))
-botao_login.click()
+# Clicar em um elemento pelo xpath
+def clicar_elemento(xpath):
+        elemento = wait_for_element(By.XPATH, xpath)
+        elemento.click()
 
-# Aguarda a interrupção manual para encerrar o programa
-while True:
-    pass
+def preencher_login(username, password):
+    username_input = wait_for_element(By.ID, 'USULOGIN')
+    username_input.send_keys(username)
 
-# O navegador será encerrado somente após a interrupção manual
+    password_input = wait_for_element(By.ID, 'USUPASSWD')
+    password_input.send_keys(password)
+
+    botao_login = wait_for_element(By.XPATH, '//button[contains(text(), "Acessar")]')
+    botao_login.click()
+
+# Efetua o login
+clicar_elemento_por_texto("a", "Login Empresa / Autônomo")
+
+preencher_login(username, password)
+
+input("Pressione Enter para sair...")
+
 driver.quit()
