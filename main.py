@@ -68,5 +68,4 @@ clicar_elemento_por_texto("a", "Login Empresa / Autônomo")
 preencher_login(username, password)
 
 input("Pressione Enter para sair...")
-
 driver.quit()
